@@ -1,4 +1,10 @@
+import os
 from setuptools import setup
+
+cd = os.path.abspath(os.path.dirname(__file__))
+
+with open(os.path.join(cd, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='tor_http_client',
@@ -10,6 +16,8 @@ setup(
     author='Wendel Frota',
     author_email='wendelalves898@gmail.com',
     description='HTTP Client for making requests through the Tor network',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/wendelfrota/tor-http-client',
     classifiers=[
         'Programming Language :: Python :: 3',
