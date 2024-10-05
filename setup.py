@@ -11,7 +11,7 @@ setup(
     version='0.1.0',
     py_modules=['tor_http_client'],
     install_requires=[
-        'requests',
+        'requests[socks]'
     ],
     author='Wendel Frota',
     author_email='wendelalves898@gmail.com',
