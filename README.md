@@ -27,7 +27,7 @@ pip install git+https://github.com/wendelfrota/tor-http-client.git
 Here is a basic example of how to use the `TorHttpClient` class:
 
 ```python
-from tor_http_client import TorHttpClient
+from thc import TorHttpClient
 
 # Initialize the client (default Tor port is 9050)
 client = TorHttpClient(debug=True)
