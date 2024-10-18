@@ -1,7 +1,7 @@
 import json
 import argparse
 import requests
-from tor_http_client import TorHttpClient
+from thc.tor_http_client import TorHttpClient
 
 
 def main():
