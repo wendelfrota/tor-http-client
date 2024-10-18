@@ -21,11 +21,12 @@ class TorHttpClient:
     def __start_tor(self):
         try:
             subprocess.run(['sudo', 'systemctl', 'start', 'tor'], check=True)
+            self.logger.info('Tor service started successfully')
 
             if self.__debug:
                 self.show_ip()
         except subprocess.CalledProcessError as e:
-            print(f'Failed to start Tor: {e}')
+            self.logger.error(f'Failed to start Tor: {e}')
 
     def __configure_logging(self):
         logging.basicConfig(
@@ -50,8 +51,10 @@ class TorHttpClient:
             try:
                 self.__response = session.request(method, url, **kwargs)
                 self.__response.raise_for_status()
+                self.logger.debug(f'{method.upper()} request to {url} successful')
                 return self.__response
             except requests.RequestException as e:
+                self.logger.error(f'An error occurred during {method.upper()} request to {url}: {e}')
                 self.__response = None
                 return None
 
@@ -74,14 +77,18 @@ class TorHttpClient:
             self.show_ip()
 
     def show_ip(self):
-        try:
-            ip = self.get('https://httpbin.org/ip').text
-            print(f'[+] IP : {ip}')
-        except AttributeError:
-            print('[!] Failed to retrieve the IP address.')
+        response = self.get('https://httpbin.org/ip')
+        if response:
+            ip = response.json().get('origin')
+            self.logger.info(f'Current IP: {ip}')
+            return ip
+        else:
+            self.logger.warning('Failed to retrieve the IP address')
+            return None
 
     def __reload_tor(self):
         try:
             subprocess.run(['sudo', 'systemctl', 'reload', 'tor'], check=True)
+            self.logger.info('Tor service reloaded successfully')
         except subprocess.CalledProcessError as e:
-            print(f'Failed to reload Tor: {e}')
+            self.logger.error(f'Failed to reload Tor: {e}')
