@@ -89,3 +89,20 @@ class TorHttpClient:
         else:
             self.logger.warning('Failed to retrieve the IP address')
             return None
+
+    def set_timeout(self, timeout):
+        self.__session.timeout = timeout
+
+    def clear_cookies(self):
+        self.__session.cookies.clear()
+        self.logger.info('Session cookies cleared')
+
+    def get_cookies(self) -> Dict[str, str]:
+        return dict(self.__session.cookies)
+
+    def set_headers(self, headers):
+        self.__session.headers.update(headers)
+        self.logger.info('Session headers updated')
+
+    def get_headers(self) -> Dict[str, str]:
+        return dict(self.__session.headers)
