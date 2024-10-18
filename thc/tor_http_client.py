@@ -22,9 +22,6 @@ class TorHttpClient:
         try:
             subprocess.run(['sudo', 'systemctl', 'start', 'tor'], check=True)
             self.logger.info('Tor service started successfully')
-
-            if self.__debug:
-                self.show_ip()
         except subprocess.CalledProcessError as e:
             self.logger.error(f'Failed to start Tor: {e}')
 
