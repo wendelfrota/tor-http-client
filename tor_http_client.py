@@ -1,16 +1,17 @@
 import subprocess
 import requests
+from typing import Optional, Dict, Any
 
 
 class TorHttpClient:
-    def __init__(self, tor_port=9050, debug=False):
-        self.__response = None
-        self.__tor_port = tor_port
-        self.__debug = debug
+    def __init__(self, tor_port: int = 9050, debug: bool = False) -> None:
+        self.__response: Optional[requests.Response] = None
+        self.__tor_port: int = tor_port
+        self.__debug: bool = debug
         self.__start_tor()
 
     @property
-    def response(self):
+    def response(self) -> Optional[requests.Response]:
         return self.__response
 
     def __start_tor(self):
@@ -22,7 +23,7 @@ class TorHttpClient:
         except subprocess.CalledProcessError as e:
             print(f'Failed to start Tor: {e}')
 
-    def get(self, url):
+    def get(self, url: str) -> Optional[requests.Response]:
         try:
             self.__response = requests.get(
                 url=url,
@@ -37,7 +38,7 @@ class TorHttpClient:
             self.__response = None
         return self.__response
 
-    def post(self, url, data=None, json=None):
+    def post(self, url: str, data: Optional[Dict[str, Any]] = None, json: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
         try:
             self.__response = requests.post(
                 url=url,
@@ -54,7 +55,7 @@ class TorHttpClient:
             self.__response = None
         return self.__response
 
-    def put(self, url, data=None, json=None):
+    def put(self, url: str, data: Optional[Dict[str, Any]] = None, json: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
         try:
             self.__response = requests.put(
                 url=url,
@@ -71,7 +72,7 @@ class TorHttpClient:
             self.__response = None
         return self.__response
 
-    def delete(self, url):
+    def delete(self, url: str) -> Optional[requests.Response]:
         try:
             self.__response = requests.delete(
                 url=url,
