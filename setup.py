@@ -27,7 +27,7 @@ setup(
     python_requires='>=3.6',
     entry_points={
         'console_scripts': [
-            'thc=cli:main',
+            'thc=cli.cli:main',
         ],
     },
 )
