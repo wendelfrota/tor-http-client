@@ -1,8 +1,7 @@
+import requests
 import subprocess
 from contextlib import contextmanager
-
-import requests
-from typing import Optional, Dict, Any
+from typing import Optional
 
 
 class TorHttpClient:
@@ -47,69 +46,17 @@ class TorHttpClient:
                 self.__response = None
                 return None
 
-    def get(self, url: str) -> Optional[requests.Response]:
-        try:
-            self.__response = requests.get(
-                url=url,
-                proxies={
-                    'http': f'socks5://127.0.0.1:{self.__tor_port}',
-                    'https': f'socks5://127.0.0.1:{self.__tor_port}'
-                }
-            )
-            self.__response.raise_for_status()
-        except requests.RequestException as e:
-            print(f'An error occurred: {e}')
-            self.__response = None
-        return self.__response
+    def get(self, url, **kwargs) -> Optional[requests.Response]:
+        return self.__request('get', url, **kwargs)
 
-    def post(self, url: str, data: Optional[Dict[str, Any]] = None, json: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
-        try:
-            self.__response = requests.post(
-                url=url,
-                data=data,
-                json=json,
-                proxies={
-                    'http': f'socks5://127.0.0.1:{self.__tor_port}',
-                    'https': f'socks5://127.0.0.1:{self.__tor_port}'
-                }
-            )
-            self.__response.raise_for_status()
-        except requests.RequestException as e:
-            print(f'An error occurred: {e}')
-            self.__response = None
-        return self.__response
+    def post(self, url, data=None, json=None, **kwargs) -> Optional[requests.Response]:
+        return self.__request('post', url, data=data, json=json, **kwargs)
 
-    def put(self, url: str, data: Optional[Dict[str, Any]] = None, json: Optional[Dict[str, Any]] = None) -> Optional[requests.Response]:
-        try:
-            self.__response = requests.put(
-                url=url,
-                data=data,
-                json=json,
-                proxies={
-                    'http': f'socks5://127.0.0.1:{self.__tor_port}',
-                    'https': f'socks5://127.0.0.1:{self.__tor_port}'
-                }
-            )
-            self.__response.raise_for_status()
-        except requests.RequestException as e:
-            print(f'An error occurred: {e}')
-            self.__response = None
-        return self.__response
+    def put(self, url, data=None, json=None, **kwargs) -> Optional[requests.Response]:
+        return self.__request('put', url, data=data, json=json, **kwargs)
 
-    def delete(self, url: str) -> Optional[requests.Response]:
-        try:
-            self.__response = requests.delete(
-                url=url,
-                proxies={
-                    'http': f'socks5://127.0.0.1:{self.__tor_port}',
-                    'https': f'socks5://127.0.0.1:{self.__tor_port}'
-                }
-            )
-            self.__response.raise_for_status()
-        except requests.RequestException as e:
-            print(f'An error occurred: {e}')
-            self.__response = None
-        return self.__response
+    def delete(self, url, **kwargs) -> Optional[requests.Response]:
+        return self.__request('delete', url, **kwargs)
 
     def change_ip(self):
         self.__reload_tor()
