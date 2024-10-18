@@ -2,7 +2,7 @@ import logging
 import requests
 import subprocess
 from contextlib import contextmanager
-from typing import Optional
+from typing import Optional, Dict
 
 
 class TorHttpClient:
@@ -14,9 +14,12 @@ class TorHttpClient:
         self.__configure_logging()
         self.__start_tor()
 
-    @property
-    def response(self) -> Optional[requests.Response]:
-        return self.__response
+    def __configure_logging(self):
+        logging.basicConfig(
+            level=logging.DEBUG if self.__debug else logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger(__name__)
 
     def __start_tor(self):
         try:
@@ -25,12 +28,9 @@ class TorHttpClient:
         except subprocess.CalledProcessError as e:
             self.logger.error(f'Failed to start Tor: {e}')
 
-    def __configure_logging(self):
-        logging.basicConfig(
-            level=logging.DEBUG if self.__debug else logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s'
-        )
-        self.logger = logging.getLogger(__name__)
+    @property
+    def response(self) -> Optional[requests.Response]:
+        return self.__response
 
     @contextmanager
     def __tor_session(self):
@@ -42,6 +42,13 @@ class TorHttpClient:
             yield self.__session
         finally:
             self.__session.close()
+
+    def __reload_tor(self):
+        try:
+            subprocess.run(['sudo', 'systemctl', 'reload', 'tor'], check=True)
+            self.logger.info('Tor service reloaded successfully')
+        except subprocess.CalledProcessError as e:
+            self.logger.error(f'Failed to reload Tor: {e}')
 
     def __request(self, method, url, **kwargs):
         with self.__tor_session() as session:
@@ -82,10 +89,3 @@ class TorHttpClient:
         else:
             self.logger.warning('Failed to retrieve the IP address')
             return None
-
-    def __reload_tor(self):
-        try:
-            subprocess.run(['sudo', 'systemctl', 'reload', 'tor'], check=True)
-            self.logger.info('Tor service reloaded successfully')
-        except subprocess.CalledProcessError as e:
-            self.logger.error(f'Failed to reload Tor: {e}')
