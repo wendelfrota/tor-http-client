@@ -1,3 +1,4 @@
+import logging
 import requests
 import subprocess
 from contextlib import contextmanager
@@ -10,6 +11,7 @@ class TorHttpClient:
         self.__response: Optional[requests.Response] = None
         self.__tor_port: int = tor_port
         self.__debug: bool = debug
+        self.__configure_logging()
         self.__start_tor()
 
     @property
@@ -24,6 +26,13 @@ class TorHttpClient:
                 self.show_ip()
         except subprocess.CalledProcessError as e:
             print(f'Failed to start Tor: {e}')
+
+    def __configure_logging(self):
+        logging.basicConfig(
+            level=logging.DEBUG if self.__debug else logging.INFO,
+            format='%(asctime)s - %(levelname)s - %(message)s'
+        )
+        self.logger = logging.getLogger(__name__)
 
     @contextmanager
     def __tor_session(self):
