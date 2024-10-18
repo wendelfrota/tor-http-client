@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 cd = os.path.abspath(os.path.dirname(__file__))
 
@@ -7,9 +7,9 @@ with open(os.path.join(cd, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='tor_http_client',
-    version='0.1.0',
-    py_modules=['tor_http_client'],
+    name='thc',
+    version='0.2.0',
+    packages=find_packages(),
     install_requires=[
         'requests[socks]'
     ],
@@ -25,4 +25,9 @@ setup(
         'Operating System :: POSIX :: Linux',
     ],
     python_requires='>=3.6',
+    entry_points={
+        'console_scripts': [
+            'thc=cli.cli:main',
+        ],
+    },
 )
