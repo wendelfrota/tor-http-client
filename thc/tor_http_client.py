@@ -90,6 +90,14 @@ class TorHttpClient:
             self.logger.warning('Failed to retrieve the IP address')
             return None
 
+    def verify_tor_connection(self) -> bool:
+        try:
+            response = self.get('https://check.torproject.org')
+            return 'Congratulations' in response.text if response else False
+        except Exception as e:
+            self.logger.error(f'Failed to verify Tor connection: {e}')
+            return False
+
     def set_timeout(self, timeout):
         self.__session.timeout = timeout
 
