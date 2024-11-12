@@ -1,8 +1,9 @@
+import time
 import logging
 import requests
 import subprocess
 from contextlib import contextmanager
-from typing import Optional, Dict
+from typing import Optional, Dict, List
 
 
 class TorHttpClient:
@@ -61,6 +62,22 @@ class TorHttpClient:
                 self.logger.error(f'An error occurred during {method.upper()} request to {url}: {e}')
                 self.__response = None
                 return None
+
+    def __request_with_retry(self, method, url, max_retries, retry_delay, **kwargs) -> Optional[requests.Response]:
+        for attempt in range(max_retries):
+            try:
+                response = self.__request(method, url, **kwargs)
+                if response:
+                    return response
+            except requests.Timeout:
+                self.logger.warning(f'Request timeout (attempt {attempt + 1}/{max_retries})')
+            except Exception as e:
+                self.logger.error(f'Request failed (attempt {attempt + 1}/{max_retries}): {e}')
+
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                self.change_ip()
+        return None
 
     def get(self, url, **kwargs) -> Optional[requests.Response]:
         return self.__request('get', url, **kwargs)
