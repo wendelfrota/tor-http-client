@@ -79,6 +79,17 @@ class TorHttpClient:
                 self.change_ip()
         return None
 
+    def batch_requests(self, urls: List[str], max_retries, retry_delay, method: str = 'get', **kwargs) -> List[Optional[requests.Response]]:
+        results = []
+        for url in urls:
+            try:
+                response = self.__request_with_retry(method, url, max_retries, retry_delay, **kwargs)
+                results.append(response)
+            except Exception as e:
+                self.logger.error(f'Batch request failed for {url}: {e}')
+                results.append(None)
+        return results
+
     def get(self, url, **kwargs) -> Optional[requests.Response]:
         return self.__request('get', url, **kwargs)
 
