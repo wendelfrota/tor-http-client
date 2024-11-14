@@ -1,3 +1,4 @@
+import json
 import time
 import logging
 import requests
@@ -124,6 +125,21 @@ class TorHttpClient:
             return 'Congratulations' in response.text if response else False
         except Exception as e:
             self.logger.error(f'Failed to verify Tor connection: {e}')
+            return False
+
+    def export_session(self, file_path: str) -> bool:
+        try:
+            session_data = {
+                'cookies': dict(self.__session.cookies),
+                'headers': dict(self.__session.headers),
+                'proxies': self.__session.proxies
+            }
+            with open(file_path, 'w') as f:
+                json.dump(session_data, f, indent=4)
+            self.logger.info(f'Session exported to {file_path}')
+            return True
+        except Exception as e:
+            self.logger.error(f'Failed to export session: {e}')
             return False
 
     def set_timeout(self, timeout):
