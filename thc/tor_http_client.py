@@ -13,6 +13,7 @@ class TorHttpClient:
         self.__response: Optional[requests.Response] = None
         self.__tor_port: int = tor_port
         self.__debug: bool = debug
+        self.__blocked_ips: List[str] = []
         self.__configure_logging()
         self.__start_tor()
 
@@ -141,6 +142,28 @@ class TorHttpClient:
         except Exception as e:
             self.logger.error(f'Failed to export session: {e}')
             return False
+
+    def check_ip_blocked(self, blocked_ips_file: Optional[str] = None) -> bool:
+        current_ip = self.show_ip()
+        if not current_ip:
+            return False
+
+        if blocked_ips_file:
+            try:
+                with open(blocked_ips_file, 'r') as f:
+                    self.__blocked_ips = json.load(f)
+                self.logger.info(f'Loaded {len(self.__blocked_ips)} blocked IPs from file')
+            except Exception as e:
+                self.logger.error(f'Failed to load blocked IPs from file: {e}')
+                return False
+
+        is_blocked = current_ip in self.__blocked_ips
+        if is_blocked:
+            self.logger.warning(f'Current IP {current_ip} is blocked')
+        else:
+            self.logger.debug(f'Current IP {current_ip} is not blocked')
+
+        return is_blocked
 
     def set_timeout(self, timeout):
         self.__session.timeout = timeout
